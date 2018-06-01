@@ -37,7 +37,7 @@ public abstract class BaseParentFragment extends SupportFragment {
 
     @Override
     public boolean onBackPressedSupport() {
-        if (getChildFragmentManager().getBackStackEntryCount()>0)
+        if (getChildFragmentManager().getBackStackEntryCount()>1)
         {
             popChild();
         }else {
