@@ -4,6 +4,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import me.yokeyword.fragmentation.SupportFragment;
@@ -15,6 +16,7 @@ import me.yokeyword.fragmentation.SupportFragment;
 public class ViewPageAdapter extends FragmentPagerAdapter {
 
     private List<HomeListFragment> fragments;
+    private long baseId = 0;
 
 
     public ViewPageAdapter(FragmentManager fm, List<HomeListFragment> fragments) {
@@ -25,6 +27,16 @@ public class ViewPageAdapter extends FragmentPagerAdapter {
     @Override
     public Fragment getItem(int position) {
         return fragments.get(position);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return baseId + position;
+    }
+
+    public void changeId(int n) {
+        // shift the ID returned by getItemId outside the range of all previous fragments
+        baseId += getCount() + n;
     }
 
     @Override

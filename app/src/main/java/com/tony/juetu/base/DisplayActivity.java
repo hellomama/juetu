@@ -1,5 +1,7 @@
 package com.tony.juetu.base;
 
+import android.app.Activity;
+import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -19,13 +21,15 @@ import me.yokeyword.fragmentation.SupportFragment;
 public class DisplayActivity extends SupportActivity {
 
     public static final String EXTRA_DISPLAY_TYPE = "type";
+    public static final int EXTRA_RESULT_TYPE = 1001;
     private SupportFragment fragment;
 
 
-    public static void startActivity(Context context)
+    public static void startActivity(Activity context, int aType, int code)
     {
         Intent intent = new Intent(context,DisplayActivity.class);
-        context.startActivity(intent);
+        intent.putExtra(EXTRA_DISPLAY_TYPE,aType);
+        context.startActivityForResult(intent,code);
     }
 
     private void getFragment()

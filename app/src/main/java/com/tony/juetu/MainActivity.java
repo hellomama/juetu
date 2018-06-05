@@ -1,18 +1,23 @@
 package com.tony.juetu;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.ActivityCompat;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.tony.juetu.base.BaseParentFragment;
+import com.tony.juetu.base.DisplayActivity;
 import com.tony.juetu.home.HomeParentFragment;
+import com.tony.juetu.home.HomeViewPageFragment;
 import com.tony.juetu.hot.HotParentFragment;
 import com.tony.juetu.serach.SearchParentFragment;
 import com.tony.juetu.setting.SettingParentFragment;
 
+import me.yokeyword.fragmentation.ISupportFragment;
 import me.yokeyword.fragmentation.SupportActivity;
 import me.yokeyword.fragmentation.SupportFragment;
 
@@ -75,6 +80,21 @@ public class MainActivity extends SupportActivity implements BaseParentFragment.
             pop();
         } else {
             ActivityCompat.finishAfterTransition(this);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == DisplayActivity.EXTRA_RESULT_TYPE)
+        {
+            ISupportFragment fragment = mFragments[HOME].getTopChildFragment();;
+            if (fragment instanceof HomeViewPageFragment)
+            {
+                ((HomeViewPageFragment) fragment).updateTab();
+                Log.d("Tony","tony");
+            }
         }
     }
 }

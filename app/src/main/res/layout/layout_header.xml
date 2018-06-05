@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <ImageView
+        android:id="@+id/img_back"
+        android:padding="15dp"
+        android:layout_gravity="start"
+        android:src="@drawable/fragmentation_ic_right"
+        android:layout_width="?attr/actionBarSize"
+        android:layout_height="?attr/actionBarSize" />
+    <TextView
+        android:id="@+id/text_title"
+        android:layout_marginLeft="?attr/actionBarSize"
+        android:layout_marginStart="?attr/actionBarSize"
+        android:layout_marginEnd="?attr/actionBarSize"
+        android:layout_marginRight="?attr/actionBarSize"
+        tools:text="@string/app_name"
+        android:gravity="center"
+        android:textSize="20sp"
+        android:textColor="@color/COLOR_03"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize" />
+
+</FrameLayout>

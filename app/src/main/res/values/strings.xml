@@ -4,4 +4,6 @@
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
     <string name="title_me">me</string>
+
+    <string name="title_all_category">首页特别展示</string>
 </resources>
