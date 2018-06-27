@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import com.tony.juetu.R;
 import com.tony.juetu.base.BaseParentFragment;
+import com.tony.juetu.home.HomeViewPageFragment;
 
 /**
  * Created by dev on 5/31/18.
@@ -29,5 +30,14 @@ public class SettingParentFragment extends BaseParentFragment {
         TextView textView = view.findViewById(R.id.text);
         textView.setText(SettingParentFragment.class.getName());
         return view;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (findChildFragment(LoginFragment.class) == null)
+        {
+            loadRootFragment(R.id.base_container,LoginFragment.getInstance());
+        }
     }
 }

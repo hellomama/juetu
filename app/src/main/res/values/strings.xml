@@ -6,4 +6,10 @@
     <string name="title_me">me</string>
 
     <string name="title_all_category">首页特别展示</string>
+    <string name="text_account">账号</string>
+    <string name="text_password">密码</string>
+    <string name="text_login">登陆</string>
+
+    <string name="text_account_invalid">invalid account</string>
+    <string name="text_pwd_invalid">invalid password</string>
 </resources>
