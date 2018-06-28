@@ -1,4 +1,4 @@
-package com.tony.juetu.serach;
+package com.tony.juetu.conversation;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -9,18 +9,16 @@ import android.widget.TextView;
 
 import com.tony.juetu.R;
 import com.tony.juetu.base.BaseParentFragment;
-import com.tony.juetu.setting.SettingParentFragment;
 
 /**
  * Created by dev on 5/31/18.
  */
 
-public class SearchParentFragment extends BaseParentFragment {
+public class ConversationParentFragment extends BaseParentFragment {
 
-
-    public static SearchParentFragment getInstance()
+    public static ConversationParentFragment getInstance()
     {
-        return new SearchParentFragment();
+        return new ConversationParentFragment();
     }
 
     @Nullable
@@ -28,7 +26,7 @@ public class SearchParentFragment extends BaseParentFragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_base_layout,container,false);
         TextView textView = view.findViewById(R.id.text);
-        textView.setText(SearchParentFragment.class.getName());
+        textView.setText(ConversationParentFragment.class.getName());
         return view;
     }
 }

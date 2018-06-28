@@ -1,4 +1,4 @@
-package com.tony.juetu;
+package com.tony.juetu.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,14 +7,14 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.MenuItem;
-import android.widget.TextView;
 
+import com.tony.juetu.R;
 import com.tony.juetu.base.BaseParentFragment;
 import com.tony.juetu.base.DisplayActivity;
 import com.tony.juetu.home.HomeParentFragment;
 import com.tony.juetu.home.HomeViewPageFragment;
-import com.tony.juetu.hot.HotParentFragment;
-import com.tony.juetu.serach.SearchParentFragment;
+import com.tony.juetu.conversation.ConversationParentFragment;
+import com.tony.juetu.notification.NotificationParentFragment;
 import com.tony.juetu.setting.SettingParentFragment;
 
 import me.yokeyword.fragmentation.ISupportFragment;
@@ -54,8 +54,8 @@ public class MainActivity extends SupportActivity implements BaseParentFragment.
         if (homeFragment == null)
         {
             mFragments[HOME] = HomeParentFragment.getInstance();
-            mFragments[HOT] = HotParentFragment.getInstance();
-            mFragments[SEARCH] = SearchParentFragment.getInstance();
+            mFragments[HOT] = ConversationParentFragment.getInstance();
+            mFragments[SEARCH] = NotificationParentFragment.getInstance();
             mFragments[SETTING] = SettingParentFragment.getInstance();
 
             loadMultipleRootFragment(R.id.container, HOME,
@@ -65,8 +65,8 @@ public class MainActivity extends SupportActivity implements BaseParentFragment.
                     mFragments[SETTING]);
         }else {
             mFragments[HOME] = homeFragment;
-            mFragments[HOT] = findFragment(HotParentFragment.class);
-            mFragments[SEARCH] = findFragment(SearchParentFragment.class);
+            mFragments[HOT] = findFragment(ConversationParentFragment.class);
+            mFragments[SEARCH] = findFragment(NotificationParentFragment.class);
             mFragments[SETTING] = findFragment(SettingParentFragment.class);
         }
 
