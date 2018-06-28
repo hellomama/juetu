@@ -1,4 +1,4 @@
-package com.tony.juetu.notification;
+package com.tony.juetu.conversation;
 
 import android.content.Context;
 import android.content.Intent;
@@ -11,36 +11,34 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.tony.juetu.R;
+import com.tony.juetu.notification.NotificationAdapter;
 
 import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.roster.RosterEntry;
 import org.jxmpp.jid.Jid;
 
 import java.util.ArrayList;
 
+import static com.tony.juetu.Common.Constant.ACTION_SEND_MESSAGE;
 import static com.tony.juetu.Common.Constant.ACTION_SEND_SUBSCRIBE;
 import static com.tony.juetu.Common.Constant.EXTRA_DATA;
 
-/**
- * Created by dev on 6/28/18.
- */
-
-public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.NotificationHolder> {
-
+public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactHolder>{
     private Context mContext;
     private LayoutInflater inflater;
-    private ArrayList<Presence> presences = new ArrayList<>();
+    private ArrayList<RosterEntry> entries = new ArrayList<>();
 
-    public NotificationAdapter(Context aContext) {
+    public ContactAdapter(Context aContext) {
         mContext = aContext;
         inflater = LayoutInflater.from(mContext);
     }
 
-    public void updateData(ArrayList<Presence> presence)
+    public void updateData(ArrayList<RosterEntry>aEntries)
     {
-        if (presence != null)
+        if (entries != null)
         {
-            presences.clear();
-            presences.addAll(presence);
+            entries.clear();
+            entries.addAll(aEntries);
             notifyDataSetChanged();
         }
     }
@@ -48,43 +46,39 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
     @NonNull
     @Override
-    public NotificationHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ContactAdapter.ContactHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = inflater.inflate(R.layout.item_notification,parent,false);
-        return new NotificationHolder(view);
+        return new ContactAdapter.ContactHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull NotificationHolder holder, int position) {
-        final Presence presence = presences.get(position);
-        Jid jid = presence.getFrom();
+    public void onBindViewHolder(@NonNull ContactAdapter.ContactHolder holder, int position) {
+        final RosterEntry entry = entries.get(position);
+        Jid jid = entry.getJid();
         holder.name.setText(jid.toString());
-        holder.message.setText(presence.getType().name());
-        holder.status.setText(presence.getStatus());
         holder.parent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (presence.getType().equals(Presence.Type.subscribe))
-                {
                     Intent intent = new Intent();
-                    intent.setAction(ACTION_SEND_SUBSCRIBE);
-                    intent.putExtra(EXTRA_DATA,presence.getFrom().toString());
+                    intent.setAction(ACTION_SEND_MESSAGE);
+                    intent.putExtra(EXTRA_DATA,entry.getJid().toString());
                     v.getContext().sendBroadcast(intent);
-                }
+
             }
         });
     }
 
     @Override
     public int getItemCount() {
-        return presences.size();
+        return entries.size();
     }
 
-    static class NotificationHolder extends RecyclerView.ViewHolder
+    static class ContactHolder extends RecyclerView.ViewHolder
     {
         ImageView avatar;
         TextView name,status,message,time;
         View parent;
-        public NotificationHolder(View itemView) {
+        public ContactHolder(View itemView) {
             super(itemView);
             parent = itemView;
             avatar = itemView.findViewById(R.id.img_avatar);
@@ -93,5 +87,9 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             message = itemView.findViewById(R.id.text_message);
             time = itemView.findViewById(R.id.text_time);
         }
+    }
+
+    public interface onClickListener{
+        void onClick();
     }
 }

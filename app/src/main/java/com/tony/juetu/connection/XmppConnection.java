@@ -4,10 +4,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.tony.juetu.manager.DataManager;
 
+import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.ReconnectionManager;
 import org.jivesoftware.smack.SmackException;
@@ -55,6 +57,7 @@ public class XmppConnection implements ConnectionListener ,IncomingChatMessageLi
         XMPPTCPConnectionConfiguration.Builder builder = XMPPTCPConnectionConfiguration.builder();
         builder.setXmppDomain("xmpp.jp");
         builder.setUsernameAndPassword(mName,mPassword);
+        builder.setSecurityMode(ConnectionConfiguration.SecurityMode.ifpossible);
         builder.setResource("Work");
 
         connection = new XMPPTCPConnection(builder.build());
@@ -99,6 +102,25 @@ public class XmppConnection implements ConnectionListener ,IncomingChatMessageLi
         }catch (InterruptedException e)
         {
             e.fillInStackTrace();
+        }
+    }
+
+    public void sendPacket(@Nullable String to)
+    {
+        Presence presenceRes = new Presence(Presence.Type.subscribed);
+        try {
+            Jid jid = JidCreate.bareFrom(to);
+            presenceRes.setTo(jid);
+            connection.sendStanza(presenceRes);
+        }catch (SmackException.NotConnectedException e)
+        {
+            e.fillInStackTrace();
+        }catch (InterruptedException e)
+        {
+            e.printStackTrace();
+        }catch (XmppStringprepException e)
+        {
+            e.printStackTrace();
         }
     }
 

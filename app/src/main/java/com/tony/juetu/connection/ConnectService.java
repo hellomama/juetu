@@ -16,12 +16,17 @@ import android.util.Log;
 import com.tony.juetu.manager.DataManager;
 
 import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.StanzaListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.filter.StanzaTypeFilter;
 import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.packet.Stanza;
 import org.jivesoftware.smack.roster.Roster;
 import org.jivesoftware.smack.roster.RosterEntry;
+import org.jivesoftware.smack.roster.RosterListener;
 import org.jivesoftware.smack.roster.SubscribeListener;
+import org.jxmpp.jid.BareJid;
 import org.jxmpp.jid.Jid;
 import org.jxmpp.jid.impl.JidCreate;
 import org.jxmpp.stringprep.XmppStringprepException;
@@ -30,7 +35,10 @@ import java.io.IOException;
 import java.util.Collection;
 
 import static com.tony.juetu.Common.Constant.ACTION_SEND_MESSAGE;
+import static com.tony.juetu.Common.Constant.ACTION_SEND_SUBSCRIBE;
 import static com.tony.juetu.Common.Constant.ACTION_UPDATE_PRESENCE;
+import static com.tony.juetu.Common.Constant.ACTION_UPDATE_ROSTER_ENTRY;
+import static com.tony.juetu.Common.Constant.EXTRA_DATA;
 import static com.tony.juetu.Common.Constant.NAME;
 import static com.tony.juetu.Common.Constant.PASSWORD;
 import static com.tony.juetu.Common.Constant.UPDATE;
@@ -192,19 +200,37 @@ public class ConnectService extends Service implements ConnectResultListener{
         sendBroadcast(intent);
     }
 
+    private void updateRosterBroadcast()
+    {
+        Intent i = new Intent();
+        i.setAction(ACTION_UPDATE_ROSTER_ENTRY);
+        sendBroadcast(i);
+    }
+
     private void registerBroadcastRec()
     {
         uiThreadMessageReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                if (intent != null && intent.getAction() != null && intent.getAction().equals(ACTION_SEND_MESSAGE))
+                if (intent != null)
                 {
-                    xmppConnection.sendMessage();
+                    String action = intent.getAction();
+                    if (action != null) {
+                        if (action.equals(ACTION_SEND_MESSAGE)) {
+                            xmppConnection.sendMessage();
+                        } else if (action.equals(ACTION_SEND_SUBSCRIBE))
+                        {
+                            String to = intent.getStringExtra(EXTRA_DATA);
+                            xmppConnection.sendPacket(to);
+                            addFriend(roster,to);
+                        }
+                    }
                 }
             }
         };
         IntentFilter filter = new IntentFilter();
         filter.addAction(ACTION_SEND_MESSAGE);
+        filter.addAction(ACTION_SEND_SUBSCRIBE);
         registerReceiver(uiThreadMessageReceiver,filter);
     }
 
@@ -215,16 +241,40 @@ public class ConnectService extends Service implements ConnectResultListener{
             if (!roster.isLoaded())
             {
                 roster.reloadAndWait();
-                Collection<RosterEntry> entries = roster.getEntries();
-
-                for (RosterEntry entry : entries)
-                {
-                    System.out.println("Here: " + entry);
-                }
             }
+            Collection<RosterEntry> entries = roster.getEntries();
+
+            for (RosterEntry entry : entries)
+            {
+                DataManager.getInstance().addRosterEntry(entry);
+                System.out.println("Here: " + entry);
+            }
+
             roster.setSubscriptionMode(Roster.SubscriptionMode.manual);
+            updateRosterBroadcast();
             DataManager.getInstance().addToPresencesManager(roster.getAvailablePresences(JidCreate.bareFrom(mName)));
             updatePresenceBrocadcast();
+            roster.addRosterListener(new RosterListener() {
+                @Override
+                public void entriesAdded(Collection<Jid> addresses) {
+
+                }
+
+                @Override
+                public void entriesUpdated(Collection<Jid> addresses) {
+
+                }
+
+                @Override
+                public void entriesDeleted(Collection<Jid> addresses) {
+
+                }
+
+                @Override
+                public void presenceChanged(Presence presence) {
+
+                }
+            });
             roster.addSubscribeListener(new SubscribeListener() {
                 @Override
                 public SubscribeAnswer processSubscribe(Jid from, Presence subscribeRequest) {
@@ -233,6 +283,15 @@ public class ConnectService extends Service implements ConnectResultListener{
                     return null;
                 }
             });
+            connection.addAsyncStanzaListener(new StanzaListener() {
+                @Override
+                public void processStanza(Stanza packet) throws SmackException.NotConnectedException, InterruptedException, SmackException.NotLoggedInException {
+                    if (packet instanceof Presence)
+                    {
+
+                    }
+                }
+            },new StanzaTypeFilter(Presence.class));
         }catch (SmackException.NotConnectedException e)
         {
             e.printStackTrace();
@@ -243,6 +302,33 @@ public class ConnectService extends Service implements ConnectResultListener{
         {
             e.printStackTrace();
         }catch (XmppStringprepException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public void addFriend(Roster roster,String to){
+
+        try {
+            BareJid jid = JidCreate.bareFrom(to);
+            roster.createEntry(jid,to, new String[]{"Friends"});
+            Log.d(TAG,"添加好友成功！！");
+        } catch (XmppStringprepException e) {
+            e.printStackTrace();
+            Log.d(TAG,"添加好友失败！！");
+        }catch (SmackException.NotLoggedInException e)
+        {
+            e.printStackTrace();
+        }catch (SmackException.NoResponseException e2)
+        {
+            e2.printStackTrace();
+        }catch (XMPPException.XMPPErrorException e)
+        {
+            e.printStackTrace();
+        }catch (SmackException.NotConnectedException e)
+        {
+            e.printStackTrace();
+        }catch (InterruptedException e)
         {
             e.printStackTrace();
         }

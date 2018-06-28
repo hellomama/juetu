@@ -1,4 +1,4 @@
-package com.tony.juetu.notification;
+package com.tony.juetu.conversation;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -10,27 +10,23 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.tony.juetu.R;
+import com.tony.juetu.notification.NotificationAdapter;
 
-import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.roster.RosterEntry;
 
 import java.util.ArrayList;
 
 import me.yokeyword.fragmentation.SupportFragment;
 
-/**
- * Created by dev on 6/28/18.
- */
-
-public class NotificationFragment extends SupportFragment implements NotificationView {
-
-    public static NotificationFragment getInstance()
+public class ContactFragment extends SupportFragment implements ContactView{
+    public static ContactFragment getInstance()
     {
-        NotificationFragment fragment = new NotificationFragment();
+        ContactFragment fragment = new ContactFragment();
         return fragment;
     }
 
-    private NotificationAdapter adapter;
-    private NotificationPresenter presenter;
+    private ContactAdapter adapter;
+    private ContactPresenter presenter;
 
     @Nullable
     @Override
@@ -42,20 +38,19 @@ public class NotificationFragment extends SupportFragment implements Notificatio
 
     private void initView(View aRoot)
     {
-        presenter = new NotificationPresenter(this);
-        presenter.initNotification();
-
         RecyclerView recyclerView = aRoot.findViewById(R.id.list);
         recyclerView.setLayoutManager(new LinearLayoutManager(_mActivity));
-        adapter = new NotificationAdapter(_mActivity);
+        adapter = new ContactAdapter(_mActivity);
         recyclerView.setAdapter(adapter);
+        presenter = new ContactPresenter(this);
+        presenter.initContact();
     }
 
     @Override
-    public void updateNotification(ArrayList<Presence> presences) {
+    public void updateContact(ArrayList<RosterEntry>entries) {
         if (adapter != null)
         {
-            adapter.updateData(presences);
+            adapter.updateData(entries);
         }
     }
 }

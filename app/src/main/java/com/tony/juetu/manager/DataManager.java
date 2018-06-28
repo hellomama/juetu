@@ -1,6 +1,7 @@
 package com.tony.juetu.manager;
 
 import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.roster.RosterEntry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.List;
 public class DataManager {
 
     private ArrayList<Presence> presences;
+    private ArrayList<RosterEntry> rosterEntries;
     private static DataManager sInstance;
 
     public static DataManager getInstance()
@@ -33,6 +35,10 @@ public class DataManager {
         if (presences == null)
         {
             presences = new ArrayList<>();
+        }
+        if (rosterEntries == null)
+        {
+            rosterEntries = new ArrayList<>();
         }
     }
 
@@ -60,5 +66,31 @@ public class DataManager {
     public ArrayList<Presence> getPresences()
     {
         return presences;
+    }
+
+    public ArrayList<RosterEntry> getRosterEntries() {
+        return rosterEntries;
+    }
+
+    public void addRosterEntry(RosterEntry entry)
+    {
+        if (!rosterEntries.contains(entry))
+        {
+            rosterEntries.add(entry);
+        }
+    }
+
+    public void addRosterEntries(List<RosterEntry>entries)
+    {
+        rosterEntries.clear();
+        rosterEntries.addAll(entries);
+    }
+
+    public void removeRosterEntry(RosterEntry entry)
+    {
+        if (rosterEntries.contains(entry))
+        {
+            rosterEntries.remove(entry);
+        }
     }
 }
