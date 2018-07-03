@@ -1,15 +1,18 @@
-package com.tony.juetu.activities;
+package com.tony.juetu.setting;
 
 import android.content.Intent;
 import android.os.Bundle;
 
 import com.tony.juetu.R;
-import com.tony.juetu.setting.LoginFragment;
+import com.tony.juetu.activities.MainActivity;
 import com.tony.juetu.utils.PreUtils;
 
 import java.util.HashMap;
 
 import me.yokeyword.fragmentation.SupportActivity;
+
+import static com.tony.juetu.utils.PreUtils.JSON_ACCOUNT;
+import static com.tony.juetu.utils.PreUtils.JSON_PASSWORD;
 
 /**
  * Created by dev on 6/28/18.
@@ -44,8 +47,7 @@ public class LoginActivity extends SupportActivity {
         {
           loadRootFragment(R.id.base_container, LoginFragment.getInstance());
         }else {
-            Intent intent = new Intent(this,MainActivity.class);
-            startActivity(intent);
+            MainActivity.start(this,(String) accountInfo.get(JSON_ACCOUNT),(String)accountInfo.get(JSON_PASSWORD));
             finish();
         }
     }

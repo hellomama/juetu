@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<android.support.design.widget.AppBarLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
     <ImageView
         android:id="@+id/img_back"
         android:padding="15dp"
         android:layout_gravity="start"
-        android:src="@drawable/fragmentation_ic_right"
+        android:src="@mipmap/back"
         android:layout_width="?attr/actionBarSize"
         android:layout_height="?attr/actionBarSize" />
     <TextView
@@ -23,5 +26,6 @@
         android:textColor="@color/COLOR_03"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize" />
+    </FrameLayout>
 
-</FrameLayout>
+</android.support.design.widget.AppBarLayout>

@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">掘土</string>
     <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
+    <string name="title_conversation">Conversation</string>
     <string name="title_notifications">Notifications</string>
     <string name="title_me">me</string>
 
@@ -13,4 +13,10 @@
 
     <string name="text_account_invalid">invalid account</string>
     <string name="text_pwd_invalid">invalid password</string>
+
+    <string name="yesterday">Yesterday</string>
+
+    <string name="day_format">h:mm aa</string>
+    <string name="week_format">EEEE</string>
+    <string name="year_format">yyyy/MM/dd</string>
 </resources>

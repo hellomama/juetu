@@ -35,9 +35,9 @@ public class SettingParentFragment extends BaseParentFragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        if (findChildFragment(LoginFragment.class) == null)
-        {
-            loadRootFragment(R.id.base_container,LoginFragment.getInstance());
-        }
+//        if (findChildFragment(LoginFragment.class) == null)
+//        {
+//            loadRootFragment(R.id.base_container,LoginFragment.getInstance());
+//        }
     }
 }

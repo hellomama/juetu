@@ -1,4 +1,4 @@
-package com.tony.juetu.connection;
+package com.tony.juetu.xmpp;
 
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -13,7 +13,9 @@ import android.os.Message;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.tony.juetu.common.Constant;
 import com.tony.juetu.manager.DataManager;
+import com.tony.juetu.utils.PreUtils;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.StanzaListener;
@@ -34,23 +36,14 @@ import org.jxmpp.stringprep.XmppStringprepException;
 import java.io.IOException;
 import java.util.Collection;
 
-import static com.tony.juetu.Common.Constant.ACTION_SEND_MESSAGE;
-import static com.tony.juetu.Common.Constant.ACTION_SEND_SUBSCRIBE;
-import static com.tony.juetu.Common.Constant.ACTION_UPDATE_PRESENCE;
-import static com.tony.juetu.Common.Constant.ACTION_UPDATE_ROSTER_ENTRY;
-import static com.tony.juetu.Common.Constant.EXTRA_DATA;
-import static com.tony.juetu.Common.Constant.NAME;
-import static com.tony.juetu.Common.Constant.PASSWORD;
-import static com.tony.juetu.Common.Constant.UPDATE;
-import static com.tony.juetu.Common.Constant.ACTION_UPDATE_UI;
-import static com.tony.juetu.connection.ConnectService.HandleType.HandleConnection;
-import static com.tony.juetu.connection.ConnectService.HandleType.HandleIntent;
+import static com.tony.juetu.xmpp.ConnectService.HandleType.HandleConnection;
+import static com.tony.juetu.xmpp.ConnectService.HandleType.HandleIntent;
 
 public class ConnectService extends Service implements ConnectResultListener{
 
     private final static String TAG = ConnectService.class.getSimpleName();
     private XmppConnection xmppConnection;
-    private String mName = TAG;
+    private String mName,mPassword;
     private volatile Looper mServiceLooper;
     private volatile ServiceHandler mServiceHandler;
     private BroadcastReceiver uiThreadMessageReceiver;
@@ -107,27 +100,40 @@ public class ConnectService extends Service implements ConnectResultListener{
     private void onHandleIntent(@Nullable Intent intent){
         if (intent != null)
         {
-            String name = intent.getStringExtra(NAME);
-            String password = intent.getStringExtra(PASSWORD);
-            xmppConnection = new XmppConnection(this,name,password);
-            try {
-                xmppConnection.connect(this);
-            }catch (IOException e)
-            {
-                e.fillInStackTrace();
-            }catch (SmackException e1)
-            {
-                e1.fillInStackTrace();
-            }catch (XMPPException e)
-            {
-                e.fillInStackTrace();
-            }
-            catch (InterruptedException e)
-            {
-                e.fillInStackTrace();
-            }
+            mName = intent.getStringExtra(Constant.NAME);
+            mPassword = intent.getStringExtra(Constant.PASSWORD);
+            xmppConnection = new XmppConnection(this,mName,mPassword);
+            connect();
 
         }
+    }
+
+    private void connect()
+    {
+        try {
+            xmppConnection.connect(this);
+        }catch (IOException e)
+        {
+            e.fillInStackTrace();
+        }catch (SmackException e1)
+        {
+            e1.fillInStackTrace();
+        }catch (XMPPException e)
+        {
+            e.fillInStackTrace();
+        }
+        catch (InterruptedException e)
+        {
+            e.fillInStackTrace();
+        }
+    }
+
+    private void sendMessage(Intent intent)
+    {
+        Message msg = mServiceHandler.obtainMessage();
+        msg.arg2 = HandleIntent.type;
+        msg.obj = intent;
+        mServiceHandler.sendMessage(msg);
     }
 
     @Override
@@ -167,12 +173,19 @@ public class ConnectService extends Service implements ConnectResultListener{
         {
             xmppConnection.disconnect();
         }
+
+        if (uiThreadMessageReceiver != null)
+        {
+            unregisterReceiver(uiThreadMessageReceiver);
+        }
         mServiceLooper.quit();
         super.onDestroy();
     }
 
     @Override
     public void Connected(org.jivesoftware.smack.XMPPConnection connection) {
+        saveAccount();
+        XmppChatManager.getInstance().initManager(connection);
         updateUIBroadcast(true);
         Message msg = mServiceHandler.obtainMessage();
         msg.arg2 = HandleConnection.type;
@@ -185,25 +198,30 @@ public class ConnectService extends Service implements ConnectResultListener{
         updateUIBroadcast(false);
     }
 
+    private void saveAccount()
+    {
+        PreUtils.getInstance().saveAccount(mName,mPassword);
+    }
+
     private void updateUIBroadcast(boolean update)
     {
         Intent intent = new Intent();
-        intent.putExtra(UPDATE,update);
-        intent.setAction(ACTION_UPDATE_UI);
+        intent.putExtra(Constant.UPDATE,update);
+        intent.setAction(Constant.ACTION_UPDATE_UI);
         sendBroadcast(intent);
     }
 
-    private void updatePresenceBrocadcast()
+    private void updatePresenceBroadcast()
     {
         Intent intent = new Intent();
-        intent.setAction(ACTION_UPDATE_PRESENCE);
+        intent.setAction(Constant.ACTION_UPDATE_PRESENCE);
         sendBroadcast(intent);
     }
 
     private void updateRosterBroadcast()
     {
         Intent i = new Intent();
-        i.setAction(ACTION_UPDATE_ROSTER_ENTRY);
+        i.setAction(Constant.ACTION_UPDATE_ROSTER_ENTRY);
         sendBroadcast(i);
     }
 
@@ -212,26 +230,45 @@ public class ConnectService extends Service implements ConnectResultListener{
         uiThreadMessageReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
+                Log.d(TAG,"receive broadcast");
                 if (intent != null)
                 {
                     String action = intent.getAction();
                     if (action != null) {
-                        if (action.equals(ACTION_SEND_MESSAGE)) {
-                            xmppConnection.sendMessage();
-                        } else if (action.equals(ACTION_SEND_SUBSCRIBE))
+                        switch (action)
                         {
-                            String to = intent.getStringExtra(EXTRA_DATA);
-                            xmppConnection.sendPacket(to);
-                            addFriend(roster,to);
+                            case Constant.ACTION_SEND_MESSAGE:
+//                                xmppConnection.sendMessage();
+                                break;
+                            case Constant.ACTION_SEND_SUBSCRIBE:
+                                String to = intent.getStringExtra(Constant.EXTRA_DATA);
+                                xmppConnection.sendPacket(to);
+                                addFriend(roster,to);
+                                break;
+                            case Constant.ACTION_SEND_RECONNECT:
+                                if (xmppConnection != null && xmppConnection.isConnectedAndAuth())
+                                {
+                                    Log.d(TAG,"connection is not null");
+                                    if (!xmppConnection.isConnectedAndAuth()) {
+                                        Log.d(TAG, "start connect");
+                                        connect();
+                                    }
+                                }else {
+                                    Log.d(TAG,"connection is null");
+                                    sendMessage(intent);
+                                }
+                                break;
                         }
                     }
                 }
             }
         };
         IntentFilter filter = new IntentFilter();
-        filter.addAction(ACTION_SEND_MESSAGE);
-        filter.addAction(ACTION_SEND_SUBSCRIBE);
+        filter.addAction(Constant.ACTION_SEND_MESSAGE);
+        filter.addAction(Constant.ACTION_SEND_SUBSCRIBE);
+        filter.addAction(Constant.ACTION_SEND_RECONNECT);
         registerReceiver(uiThreadMessageReceiver,filter);
+        Log.d(TAG,"register receiver");
     }
 
     private void prepareRoster(org.jivesoftware.smack.XMPPConnection connection)
@@ -253,7 +290,7 @@ public class ConnectService extends Service implements ConnectResultListener{
             roster.setSubscriptionMode(Roster.SubscriptionMode.manual);
             updateRosterBroadcast();
             DataManager.getInstance().addToPresencesManager(roster.getAvailablePresences(JidCreate.bareFrom(mName)));
-            updatePresenceBrocadcast();
+            updatePresenceBroadcast();
             roster.addRosterListener(new RosterListener() {
                 @Override
                 public void entriesAdded(Collection<Jid> addresses) {
@@ -279,7 +316,7 @@ public class ConnectService extends Service implements ConnectResultListener{
                 @Override
                 public SubscribeAnswer processSubscribe(Jid from, Presence subscribeRequest) {
                     DataManager.getInstance().addToPresencesManager(subscribeRequest);
-                    updatePresenceBrocadcast();
+                    updatePresenceBroadcast();
                     return null;
                 }
             });

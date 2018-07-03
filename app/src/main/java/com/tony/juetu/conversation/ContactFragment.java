@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.tony.juetu.R;
 import com.tony.juetu.notification.NotificationAdapter;
@@ -18,7 +19,7 @@ import java.util.ArrayList;
 
 import me.yokeyword.fragmentation.SupportFragment;
 
-public class ContactFragment extends SupportFragment implements ContactView{
+public class ContactFragment extends SupportFragment implements ContactView,ContactAdapter.OnClickListener{
     public static ContactFragment getInstance()
     {
         ContactFragment fragment = new ContactFragment();
@@ -38,9 +39,12 @@ public class ContactFragment extends SupportFragment implements ContactView{
 
     private void initView(View aRoot)
     {
+        ImageView back = aRoot.findViewById(R.id.img_back);
+        back.setVisibility(View.INVISIBLE);
         RecyclerView recyclerView = aRoot.findViewById(R.id.list);
         recyclerView.setLayoutManager(new LinearLayoutManager(_mActivity));
         adapter = new ContactAdapter(_mActivity);
+        adapter.setListener(this);
         recyclerView.setAdapter(adapter);
         presenter = new ContactPresenter(this);
         presenter.initContact();
@@ -52,5 +56,10 @@ public class ContactFragment extends SupportFragment implements ContactView{
         {
             adapter.updateData(entries);
         }
+    }
+
+    @Override
+    public void onClick(String toJid) {
+        start(ChatFragment.getInstance(toJid));
     }
 }

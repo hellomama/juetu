@@ -3,9 +3,10 @@ package com.tony.juetu.conversation;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 
 import com.tony.juetu.App;
-import com.tony.juetu.Common.Constant;
+import com.tony.juetu.common.Constant;
 import com.tony.juetu.manager.DataManager;
 
 public class ContactPresenter {
@@ -34,6 +35,7 @@ public class ContactPresenter {
 
     public void initContact()
     {
+        app.registerReceiver(receiver,new IntentFilter(Constant.ACTION_UPDATE_ROSTER_ENTRY));
         view.updateContact(DataManager.getInstance().getRosterEntries());
     }
 

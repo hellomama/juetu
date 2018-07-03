@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 
 import com.tony.juetu.App;
-import com.tony.juetu.Common.Constant;
+import com.tony.juetu.common.Constant;
 import com.tony.juetu.manager.DataManager;
 
 /**

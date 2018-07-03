@@ -50,4 +50,9 @@ public abstract class BaseParentFragment extends SupportFragment {
         }
         return true;
     }
+
+    protected void addFragment()
+    {
+
+    }
 }

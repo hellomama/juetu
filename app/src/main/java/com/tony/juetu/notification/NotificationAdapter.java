@@ -17,8 +17,8 @@ import org.jxmpp.jid.Jid;
 
 import java.util.ArrayList;
 
-import static com.tony.juetu.Common.Constant.ACTION_SEND_SUBSCRIBE;
-import static com.tony.juetu.Common.Constant.EXTRA_DATA;
+import static com.tony.juetu.common.Constant.ACTION_SEND_SUBSCRIBE;
+import static com.tony.juetu.common.Constant.EXTRA_DATA;
 
 /**
  * Created by dev on 6/28/18.

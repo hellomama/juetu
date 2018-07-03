@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@color/COLOR_05"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+    <include
+        android:id="@+id/layout_header"
+        layout="@layout/layout_header"/>
     <android.support.v7.widget.RecyclerView
         android:id="@+id/list"
+        android:layout_marginTop="?android:attr/actionBarSize"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
-</android.support.constraint.ConstraintLayout>
+</FrameLayout>

@@ -8,21 +8,22 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.tony.juetu.Common.Constant;
+import com.tony.juetu.common.Constant;
 import com.tony.juetu.R;
 import com.tony.juetu.activities.MainActivity;
-import com.tony.juetu.connection.ConnectService;
+import com.tony.juetu.xmpp.ConnectService;
 
 import me.yokeyword.fragmentation.SupportFragment;
 
-import static com.tony.juetu.Common.Constant.NAME;
-import static com.tony.juetu.Common.Constant.PASSWORD;
+import static com.tony.juetu.common.Constant.NAME;
+import static com.tony.juetu.common.Constant.PASSWORD;
 
 /**
  * Created by bushi on 2018/6/27.
@@ -37,6 +38,7 @@ public class LoginFragment extends SupportFragment implements View.OnClickListen
     }
 
 
+    private static final String TAG = LoginFragment.class.getSimpleName();
     private TextInputEditText account,pwd;
 
     BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -67,8 +69,13 @@ public class LoginFragment extends SupportFragment implements View.OnClickListen
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
        View view = inflater.inflate(R.layout.fragment_login,container,false);
        initView(view);
-       initReceiver();
        return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        initReceiver();
     }
 
     private void initView(View aRootView)
@@ -82,6 +89,7 @@ public class LoginFragment extends SupportFragment implements View.OnClickListen
 
     private void initReceiver()
     {
+        Log.d(TAG,"init receiver");
         IntentFilter filter = new IntentFilter(Constant.ACTION_UPDATE_UI);
         _mActivity.registerReceiver(receiver,filter);
     }

@@ -1,4 +1,4 @@
-package com.tony.juetu.connection;
+package com.tony.juetu.xmpp;
 
 /**
  * Created by dev on 6/28/18.
