@@ -26,6 +26,14 @@
         android:textColor="@color/COLOR_03"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize" />
+        <ImageView
+            android:id="@+id/img_right"
+            android:layout_gravity="right"
+            android:src="@drawable/ic_add_circle_outline_black_24dp"
+            android:padding="15dp"
+            android:visibility="invisible"
+            android:layout_width="?attr/actionBarSize"
+            android:layout_height="?attr/actionBarSize" />
     </FrameLayout>
 
 </android.support.design.widget.AppBarLayout>

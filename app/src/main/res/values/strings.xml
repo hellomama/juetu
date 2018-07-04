@@ -14,6 +14,10 @@
     <string name="text_account_invalid">invalid account</string>
     <string name="text_pwd_invalid">invalid password</string>
 
+    <string name="text_input_room_name">Create a room name</string>
+    <string name="text_input_hint">Input name here</string>
+    <string name="text_input_prefill">Room</string>
+
     <string name="yesterday">Yesterday</string>
 
     <string name="day_format">h:mm aa</string>

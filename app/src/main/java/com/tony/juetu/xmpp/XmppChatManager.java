@@ -4,12 +4,18 @@ import android.util.Log;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.chat2.Chat;
 import org.jivesoftware.smack.chat2.ChatManager;
 import org.jivesoftware.smack.chat2.IncomingChatMessageListener;
 import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smackx.muc.MucConfigFormManager;
+import org.jivesoftware.smackx.muc.MultiUserChat;
+import org.jivesoftware.smackx.muc.MultiUserChatException;
+import org.jivesoftware.smackx.muc.MultiUserChatManager;
 import org.jxmpp.jid.EntityBareJid;
 import org.jxmpp.jid.impl.JidCreate;
+import org.jxmpp.jid.parts.Resourcepart;
 import org.jxmpp.stringprep.XmppStringprepException;
 
 import java.lang.ref.WeakReference;
@@ -28,6 +34,7 @@ public class XmppChatManager implements IncomingChatMessageListener {
     private static final String TAG = XmppChatManager.class.getSimpleName();
     private static XmppChatManager sInstance;
     private ChatManager mChatManager;
+    private MultiUserChatManager mMultiUserChatManager;
     private WeakReference<InComingMessageListener> listenerWeakReference;
 
     public static XmppChatManager getInstance() {
@@ -49,6 +56,10 @@ public class XmppChatManager implements IncomingChatMessageListener {
         if (mChatManager == null)
         {
             mChatManager = ChatManager.getInstanceFor(connection);
+        }
+        if (mMultiUserChatManager == null)
+        {
+            mMultiUserChatManager = MultiUserChatManager.getInstanceFor(connection);
         }
         mChatManager.addIncomingListener(this);
     }
@@ -77,6 +88,21 @@ public class XmppChatManager implements IncomingChatMessageListener {
         {
             e.fillInStackTrace();
         }
+    }
+
+    public MultiUserChat createRoom(String roomName,String user,String password)throws SmackException.NoResponseException, XMPPException.XMPPErrorException,
+            InterruptedException, MultiUserChatException.MucAlreadyJoinedException, SmackException.NotConnectedException,
+            MultiUserChatException.NotAMucServiceException,XmppStringprepException,MultiUserChatException.MucConfigurationNotSupportedException
+    {
+        EntityBareJid jid = JidCreate.entityBareFrom(roomName);
+        MultiUserChat multiUserChat = mMultiUserChatManager.getMultiUserChat(jid);
+        MultiUserChat.MucCreateConfigFormHandle handle = multiUserChat.createOrJoin(Resourcepart.from(user));
+        MucConfigFormManager manager = handle.getConfigFormManager();
+        manager.makeMembersOnly();
+        manager.makePasswordProtected();
+        manager.setAndEnablePassword(password);
+        manager.submitConfigurationForm();
+        return multiUserChat;
     }
 
     @Override
